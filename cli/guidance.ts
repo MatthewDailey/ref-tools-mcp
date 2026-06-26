@@ -74,7 +74,11 @@ function writeCache(cache: GuidanceCache): void {
 
 function cacheAgeMs(cache: GuidanceCache): number {
   const fetched = Date.parse(cache.fetchedAt)
-  return Number.isFinite(fetched) ? Date.now() - fetched : Number.POSITIVE_INFINITY
+  if (!Number.isFinite(fetched)) return Number.POSITIVE_INFINITY
+  const age = Date.now() - fetched
+  // A negative age means a backward clock (or bad timestamp); treat it as stale
+  // so it can't pin the cache as permanently-fresh and suppress refetch.
+  return age < 0 ? Number.POSITIVE_INFINITY : age
 }
 
 function emit(

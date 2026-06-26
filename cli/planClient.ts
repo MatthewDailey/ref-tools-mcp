@@ -49,6 +49,14 @@ export class AuthError extends Error {
   }
 }
 
+/** Raised for a 404 — a permanent condition the watch should not retry. */
+export class NotFoundError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'NotFoundError'
+  }
+}
+
 function authHeaders(apiKey: string): Record<string, string> {
   return { 'x-ref-api-key': apiKey, 'X-Ref-Api-Key': apiKey }
 }
@@ -83,7 +91,7 @@ export async function fetchReviewStatus(
       throw new AuthError('Authentication failed')
     }
     if (axios.isAxiosError(error) && error.response?.status === 404) {
-      throw new Error(`Plan not found: ${planId}`)
+      throw new NotFoundError(`Plan not found: ${planId}`)
     }
     throw error
   }
