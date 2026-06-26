@@ -19,6 +19,7 @@ import {
 import axios from 'axios'
 import { createServer } from 'http'
 import { randomUUID } from 'crypto'
+import { isCliCommand, runCliCommand } from './cli/dispatch.js'
 
 // Tool configuration based on client type
 type ToolConfig = {
@@ -578,10 +579,23 @@ process.on('SIGINT', async () => {
   process.exit(0)
 })
 
-main().catch((error) => {
-  console.error('Fatal error running server:', error)
-  process.exit(1)
-})
+// Subcommand dispatch. A bare invocation (how MCP clients launch this via
+// `npx ref-tools-mcp`) and an explicit `ref mcp` both boot the MCP server; the
+// CLI subcommands (`reviews`, `guidance`, `login`) drive the local-agent loop.
+const cliCommand = process.argv[2]
+if (isCliCommand(cliCommand)) {
+  runCliCommand(cliCommand, process.argv.slice(3))
+    .then((code) => process.exit(code))
+    .catch((error) => {
+      console.error(error instanceof Error ? error.message : String(error))
+      process.exit(1)
+    })
+} else {
+  main().catch((error) => {
+    console.error('Fatal error running server:', error)
+    process.exit(1)
+  })
+}
 
 // Export the server for smithery
 export default function () {

@@ -1,7 +1,7 @@
 {
   "name": "ref-tools-mcp",
-  "version": "3.0.3",
-  "description": "ModelContextProtocol server for Ref",
+  "version": "3.1.0",
+  "description": "ModelContextProtocol server for Ref, plus the ref CLI (reviews, guidance, login)",
   "mcpName": "io.github.ref-tools/ref-tools-mcp",
   "type": "module",
   "module": "index.ts",
@@ -17,6 +17,7 @@
     "prepublishOnly": "npm run build"
   },
   "bin": {
+    "ref": "./dist/index.cjs",
     "ref-tools-mcp": "./dist/index.cjs"
   },
   "files": [
